@@ -18,7 +18,8 @@ output : Verification of magic number, block size and raw block
 #include <stdint.h>
 #include <malloc.h>
 #include "peercoin.h"
-#define MAGICNUMBER 0xE6E8E9E5;
+#define MAGICNUMBER 0xE6E8E9E5
+#define HEADER_LEN 88
 
 //uint32_t block_Verifier(FILE *, uint32_t *, uint32_t *, uint32_t *);
 
@@ -26,6 +27,8 @@ int main(int argc, char *argv[])
 {
 	FILE *inFileP;
 	FILE *outFileP;
+	FILE *block1File;
+	FILE *block2File;
 	char tempBuffer[255];
 	char inFileName[255];
 	char outFileName[255];
@@ -35,13 +38,16 @@ int main(int argc, char *argv[])
 	uint32_t blockLength[10];
 	
 	uint32_t num_of_Blocks;
+	uint16_t count;
 	
-	
-	printf("\n Enter the raw file name : ");
+	/*printf("\n Enter the raw file name : ");
 	scanf("%s",tempBuffer);
-	strncpy_s(inFileName, 255, tempBuffer, 255);
+	strncpy_s(inFileName, 255, tempBuffer, 255);*/
 
-	inFileP= fopen("blocks.dat", "rb");
+	//inFileP= fopen("blocks.dat", "rb");
+	inFileP = fopen(argv[1], "rb");
+	count = atoi(argv[2]);
+
 	if (inFileP == NULL)
 	{
 		printf("\n The input file could not be opended \n");
@@ -50,7 +56,7 @@ int main(int argc, char *argv[])
 	num_of_Blocks=block_Verifier(inFileP, blockNum, blockPos,blockLength);
 	if (num_of_Blocks > 0)
 	{
-		printf("\nBlock extraction is sucessfull\n");
+		printf("\n Block extraction is sucessfull\n");
 	}
 	else
 	{
@@ -68,26 +74,56 @@ int main(int argc, char *argv[])
 
 	}
 	// Allocating the memory for block 1 and block 2 based on the values returned form block_Verifier()
-	uint8_t *block1;
-	uint8_t *block2;
-	block1 = (uint8_t *) malloc(sizeof(uint8_t) * blockLength[0]);
-	block2 = (uint8_t *) malloc(sizeof(uint8_t) * blockLength[1]);
+	if (count > 0)
+	{
+		uint8_t *block1;
+		block1 = (uint8_t *)malloc(sizeof(uint8_t) * blockLength[0]);
+		block1File = fopen("block1.tmp", "w+");
+		fseek(inFileP, blockPos[0], SEEK_SET);
+		fread(block1, blockLength[0], 1, inFileP);
+		fwrite(block1, 1, blockLength[0], block1File);
+		rewind(block1File);
 
-	// Reading the block1 and block2 from the file and storing in the heap
+		printf("\n Parsing Block1\n");
+		printf(" ********************\n");
+		parse_Header(block1File, blockLength[0]); // parsing block1
+		uint64_t transNumber;
+		transNumber = varint(block1File, HEADER_LEN);
+		printf("\n Number of transactions in block :%lld", transNumber);
+		get_Transactions(block1File, (HEADER_LEN + transNumber)); // the 
+		get_blocksignature(block1File);
+		free(block1);
+		fclose(block1File);
+	}
+	if (count > 1)
+	{
+		uint8_t *block2;
+		block2 = (uint8_t *)malloc(sizeof(uint8_t) * blockLength[1]);
+		block2File = fopen("block2.tmp", "w+");
+		// Reading the block1 and block2 from the file and storing in the heap
+		fseek(inFileP, blockPos[1], SEEK_SET);
+		fread(block2, blockLength[1], 1, inFileP);
+		fwrite(block2, 1, blockLength[1], block2File);
+		rewind(block2File);
+		
+		printf("\n Block2 Parsing\n");
+		printf(" ********************\n");
+		parse_Header(block2File, blockLength[1]); // parsing block2
+		// parsing function of blocks to be placed here;
+		uint64_t transNumber = 0;
+		transNumber = varint(block2File, HEADER_LEN);
+		printf("\n Number of transactions :%lld", transNumber);
+		get_Transactions(block2File, (HEADER_LEN + transNumber)); // the 
+		get_blocksignature(block2File);
+		free(block2);
+		fclose(block2File);
 
-	fseek(inFileP, blockPos[0], SEEK_SET);
-	fread(block1,blockLength[0],1,inFileP);
-
-	fseek(inFileP, blockPos[1], SEEK_SET);
-	fread(block2, blockLength[1], 1, inFileP);
-	check_header(block1); // parsing block1
-	get_transactions(block1);
-	printf("\n Block2");
-	check_header(block2); // parsing block1
-	// parsing function of blocks to be placed here;
-	free(block1);
-	free(block2);
+	}
+	/*free(block1);
+	free(block2);*/
 	fclose(inFileP);
+	
+	//fclose(block2File);
 }
 
 // fucntions moved to func_peercoin.c
