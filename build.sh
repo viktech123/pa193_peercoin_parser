@@ -1,2 +1,2 @@
 gcc *.cpp -o parser
-./parser
+./parser blocks.dat
