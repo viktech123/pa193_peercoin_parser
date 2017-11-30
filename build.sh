@@ -1,2 +1,2 @@
-gcc *.c -o parser
+gcc *.cpp -o parser
 ./parser
