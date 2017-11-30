@@ -126,17 +126,17 @@ uint64_t varint(uint8_t *Pblock, int shift)
 	else if (s1 == 0xfd)
 	{
 		//fread((char *)&s2, sizeof(s2), 1, Pblock);
-
+		//fread((char *)&s2, sizeof(s2), 1, Pblock);
 		return (uint64_t)s2;
 	}
 	else if (s1 == 0xfe)
 	{
-		fread((char *)&s2, sizeof(s2), 1, Pblock);
+		//fread((char *)&s2, sizeof(s2), 1, Pblock);
 		return (uint64_t)s2;
 	}
 	else if (s1 == 0xff)
 	{
-		fread((char *)&s4, sizeof(s4), 1, Pblock);
+		//fread((char *)&s4, sizeof(s4), 1, Pblock);
 		return (uint64_t)s2;
 
 	}
