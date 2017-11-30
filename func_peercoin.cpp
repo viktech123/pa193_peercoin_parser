@@ -1,5 +1,11 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <malloc.h>
 #include "peercoin.h"
+#define MAGICNUMBER 0xE6E8E9E5;
+//#include "peercoin.h"
 uint32_t block_Verifier(FILE *inF,uint32_t *bNum, uint32_t *bPos, uint32_t *bLen)
 {
 	
