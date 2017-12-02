@@ -1,2 +1,3 @@
-gcc *.cpp -o parser
-./parser blocks.dat
+#gcc *.cpp -o parser
+make
+./parser
