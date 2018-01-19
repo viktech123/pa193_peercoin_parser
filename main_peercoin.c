@@ -74,7 +74,15 @@ int main(int argc, char *argv[])
 	uint8_t *block1;
 	uint8_t *block2;
 	block1 = (uint8_t *) malloc(sizeof(uint8_t) * blockLength[0]);
+	if(block1==NULL)
+	{printf("\n memory not allocated");
+	 exit(0);
+	}
 	block2 = (uint8_t *) malloc(sizeof(uint8_t) * blockLength[1]);
+	if(block2==NULL)
+	{printf("\n memory not allocated");
+	 exit(0);
+	}
 
 	block1File = fopen("block1.tmp", "w+"); 
 	block2File = fopen("block2.tmp", "w+");
